@@ -9,6 +9,7 @@ import com.example.ecommerce.dao.UserTokenMapper;
 import com.example.ecommerce.entity.MallUser;
 import com.example.ecommerce.entity.UserToken;
 import com.example.ecommerce.service.UserService;
+import com.example.ecommerce.util.ResultGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -90,6 +91,14 @@ public class UserServiceImpl implements UserService {
 
         if(mallUser == null){
             MallException.fail(ServiceResultEnum.DATA_NOT_EXIST.getResult());
+        }
+
+        mallUser.setNickName(userUpdateParam.getNickName());
+        mallUser.setPassword(userUpdateParam.getPassword());
+        mallUser.setIntroduceSign(userUpdateParam.getIntroduceSign());
+
+        if(mallUserMapper.save(mallUser) != null){
+            return true;
         }
 
         return false;

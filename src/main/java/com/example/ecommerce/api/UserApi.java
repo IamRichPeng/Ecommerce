@@ -3,6 +3,7 @@ package com.example.ecommerce.api;
 import com.example.ecommerce.api.param.MallUserLoginParam;
 import com.example.ecommerce.api.param.UserRegisterParam;
 import com.example.ecommerce.api.param.UserUpdateParam;
+import com.example.ecommerce.api.vo.UserVO;
 import com.example.ecommerce.common.Constants;
 import com.example.ecommerce.common.ServiceResultEnum;
 import com.example.ecommerce.config.annotation.TokenToUser;
@@ -14,6 +15,7 @@ import com.example.ecommerce.util.ResultGenerator;
 import com.example.ecommerce.util.TokenUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -69,7 +71,7 @@ public class UserApi {
     @PostMapping("/user/logout")
     public Result<String> logout(@TokenToUser MallUser mallUser){
         Boolean logoutResult = userService.logout(mallUser.getUserId());
-        log.info("logout api,loginMallUser={}", mallUser.getUserId());
+        log.info("logout api,loginMallUserId={}", mallUser.getUserId());
         if(logoutResult){
             return ResultGenerator.genSuccessResult();
         }
@@ -78,15 +80,22 @@ public class UserApi {
     }
 
     @PutMapping("/user/info")
-    public Result updateInfo(@TokenToUser MallUser mallUser, UserUpdateParam userUpdateParam){
-        Boolean updateResult = true;
+    public Result updateInfo(@TokenToUser MallUser mallUser,@RequestBody UserUpdateParam userUpdateParam){
+        Boolean updateResult = userService.updateUserInfo(userUpdateParam, mallUser.getUserId());
         if(updateResult){
             return ResultGenerator.genSuccessResult();
         }
         return ResultGenerator.genFailResult("update error");
 
-
     }
 
+    @GetMapping("/user/info")
+    public Result<UserVO> getUserDetail(@TokenToUser MallUser mallUser){
+        UserVO userVO = new UserVO();
+        // we already get mallUser by @tokentouser, so we dont need to go to service
+        BeanUtils.copyProperties(mallUser,userVO);
+        return ResultGenerator.genSuccessResult(userVO);
+
+    }
 
 }
